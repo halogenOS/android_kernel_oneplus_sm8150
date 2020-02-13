@@ -2583,6 +2583,9 @@ static int cam_ife_csid_reset_retain_sw_reg(
 	cam_io_w_mb(1, soc_info->reg_map[0].mem_base +
 		csid_reg->cmn_reg->csid_irq_cmd_addr);
 
+	cam_io_w_mb(0, soc_info->reg_map[0].mem_base +
+		csid_reg->cmn_reg->csid_top_irq_mask_addr);
+
 	cam_io_w_mb(csid_reg->cmn_reg->csid_rst_stb,
 		soc_info->reg_map[0].mem_base +
 		csid_reg->cmn_reg->csid_rst_strobes_addr);
