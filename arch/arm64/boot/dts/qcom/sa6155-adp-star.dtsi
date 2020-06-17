@@ -18,6 +18,10 @@
 	status = "ok";
 };
 
+&qupv3_2 {
+	status = "ok";
+};
+
 &bluetooth_ext {
 	status = "ok";
 };
