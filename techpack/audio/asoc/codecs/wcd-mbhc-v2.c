@@ -556,7 +556,6 @@ void wcd_mbhc_hs_elec_irq(struct wcd_mbhc *mbhc, int irq_type,
 }
 EXPORT_SYMBOL(wcd_mbhc_hs_elec_irq);
 
-
 bool headset_imp_enable = false;
 EXPORT_SYMBOL_GPL(headset_imp_enable);
 
@@ -626,10 +625,8 @@ static void judge_headset_impedance(struct wcd_mbhc *mbhc)
 		original_imp = current_imp;
 	}
 
-	pr_err("%s: current_imp is %d, original_imp is %d\n",
-			__func__,
-			current_imp,
-			original_imp);
+	pr_err("%s: current_imp is %d, original_imp is %d\n", __func__,
+			current_imp, original_imp);
 
 	ret = adapt_headset_volume(mbhc, hp_volume_gain[current_imp]);
 	if (ret < 0)
@@ -1016,7 +1013,7 @@ static void wcd_mbhc_usbc_analog_plug_detect_handler(struct wcd_mbhc *mbhc, bool
 	if (wcd_cancel_btn_work(mbhc))
 		pr_debug("%s: button press is canceled\n", __func__);
 
-	pr_info("%s: mbhc->current_plug: %d detection_type: %d\n", __func__,
+	pr_debug("%s: mbhc->current_plug: %d detection_type: %d\n", __func__,
 			mbhc->current_plug, detection_type);
 	if (mbhc->mbhc_fn->wcd_cancel_hs_detect_plug)
 		mbhc->mbhc_fn->wcd_cancel_hs_detect_plug(mbhc,
@@ -2391,8 +2388,6 @@ int wcd_mbhc_init(struct wcd_mbhc *mbhc, struct snd_soc_codec *codec,
 	mbhc->swap_thr = GND_MIC_SWAP_THRESHOLD;
 	mbhc->use_usbc_detect = use_usbc_detect;
 	mbhc->usbc_analog_status = 0;
-
-	dev_dbg(card->dev, "%s: use_usbc_detect = %d\n", __func__, mbhc->use_usbc_detect);
 
 	if (mbhc->intr_ids == NULL) {
 		pr_err("%s: Interrupt mapping not provided\n", __func__);

@@ -614,10 +614,10 @@ static int32_t afe_callback(struct apr_client_data *data, void *priv)
 		else
 			return -EINVAL;
 		} else if (data->opcode == ULTRASOUND_OPCODE) {
-		    if (NULL != data->payload)
-			    elliptic_process_apr_payload(data->payload);
-		    else
-			    pr_err("[EXPORT_SYMBOLLUS]: payload ptr is Invalid");
+			if (NULL != data->payload)
+				elliptic_process_apr_payload(data->payload);
+			else
+				pr_err("[EXPORT_SYMBOLLUS]: payload ptr is Invalid");
 
 	} else if (data->opcode == AFE_EVENT_MBHC_DETECTION_SW_WA) {
 		msm_aud_evt_notifier_call_chain(SWR_WAKE_IRQ_EVENT, NULL);
@@ -2381,9 +2381,9 @@ static struct cal_block_data *afe_find_cal(int cal_index, int port_id)
 				 __func__, cal_block->cal_data.size);
 			goto exit;
 		} else if ((afe_port_index == IDX_AFE_PORT_ID_QUATERNARY_MI2S_RX) &&
-				(afe_cal_info->acdb_id == this_afe.dev_acdb_id[afe_port_index])) {
+			     (afe_cal_info->acdb_id == this_afe.dev_acdb_id[afe_port_index])) {
 			pr_debug("%s: Because afe_port_index is %d, so cal block is a match, size is %zd\n",
-					__func__, afe_port_index, cal_block->cal_data.size);
+				 __func__, afe_port_index, cal_block->cal_data.size);
 			goto exit;
 		}
 	}

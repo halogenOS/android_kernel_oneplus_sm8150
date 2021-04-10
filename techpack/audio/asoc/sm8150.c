@@ -151,6 +151,11 @@ enum {
 	AFE_LOOPBACK_TX_IDX_MAX,
 };
 
+enum {
+	AFE_LOOPBACK_TX_IDX = 0,
+	AFE_LOOPBACK_TX_IDX_MAX,
+};
+
 struct msm_wsa881x_dev_info {
 	struct device_node *of_node;
 	u32 index;
@@ -353,6 +358,10 @@ static struct dev_config slim_tx_cfg[] = {
 	[SLIM_TX_7] = {SAMPLING_RATE_8KHZ, SNDRV_PCM_FORMAT_S16_LE, 1},
 	[SLIM_TX_8] = {SAMPLING_RATE_48KHZ, SNDRV_PCM_FORMAT_S16_LE, 2},
 };
+static struct dev_config afe_loopback_tx_cfg[] = {
+	[AFE_LOOPBACK_TX_IDX] = {SAMPLING_RATE_48KHZ, SNDRV_PCM_FORMAT_S16_LE, 1},
+};
+
 static struct dev_config afe_loopback_tx_cfg[] = {
 	[AFE_LOOPBACK_TX_IDX] = {SAMPLING_RATE_48KHZ, SNDRV_PCM_FORMAT_S16_LE, 1},
 };
@@ -659,10 +668,9 @@ static struct wcd_mbhc_config wcd_mbhc_cfg = {
 	.key_code[3] = 0,
 #else
 	.key_code[0] = KEY_MEDIA,
-	.key_code[1] = KEY_VOICECOMMAND,
-	.key_code[2] = KEY_VOLUMEUP,
-	.key_code[3] = KEY_VOLUMEDOWN,
-#endif
+	.key_code[1] = KEY_VOLUMEUP,
+	.key_code[2] = KEY_VOLUMEDOWN,
+	.key_code[3] = 0,
 	.key_code[4] = 0,
 	.key_code[5] = 0,
 	.key_code[6] = 0,
@@ -890,10 +898,9 @@ static int slim_get_port_idx(struct snd_kcontrol *kcontrol)
 	} else if (strnstr(kcontrol->id.name,
 					   "SLIM_1_TX", sizeof("SLIM_1_TX"))) {
 		port_id = SLIM_TX_1;
-        }else if (strnstr(kcontrol->id.name,
-                                           "SLIM_2_TX", sizeof("SLIM_2_TX"))){
-                port_id = SLIM_TX_2;
-
+    } else if (strnstr(kcontrol->id.name,
+					   "SLIM_2_TX", sizeof("SLIM_2_TX"))) {
+		port_id = SLIM_TX_2;
 	} else {
 		pr_err("%s: unsupported channel: %s",
 			__func__, kcontrol->id.name);
@@ -1056,21 +1063,17 @@ static int slim_tx_bit_format_put(struct snd_kcontrol *kcontrol,
 static int afe_loopback_tx_ch_get(struct snd_kcontrol *kcontrol,
  				struct snd_ctl_elem_value *ucontrol)
 {
-   pr_debug("%s: msm_slim_[0]_rx_ch	= %d\n", __func__,
- 	   afe_loopback_tx_cfg[0].channels);
-   ucontrol->value.enumerated.item[0] = afe_loopback_tx_cfg[0].channels - 1;
+	ucontrol->value.enumerated.item[0] = afe_loopback_tx_cfg[0].channels - 1;
 
-   return 0;
+	return 0;
 }
 
 static int afe_loopback_tx_ch_put(struct snd_kcontrol *kcontrol,
  				struct snd_ctl_elem_value *ucontrol)
 {
-   afe_loopback_tx_cfg[0].channels = ucontrol->value.enumerated.item[0] + 1;
-   pr_debug("%s: msm_slim_[0]_rx_ch	= %d\n", __func__,
- 	   afe_loopback_tx_cfg[0].channels);
+	afe_loopback_tx_cfg[0].channels = ucontrol->value.enumerated.item[0] + 1;
 
-   return 1;
+	return 1;
 }
 
 static int slim_rx_ch_get(struct snd_kcontrol *kcontrol,
@@ -4515,11 +4518,7 @@ static void *def_wcd_mbhc_cal(void)
 		return NULL;
 
 #define S(X, Y) ((WCD_MBHC_CAL_PLUG_TYPE_PTR(wcd_mbhc_cal)->X) = (Y))
-#if 0
-	S(v_hs_max, 1600);
-#else
 	S(v_hs_max, 1700);
-#endif
 #undef S
 #define S(X, Y) ((WCD_MBHC_CAL_BTN_DET_PTR(wcd_mbhc_cal)->X) = (Y))
 	S(num_btn, WCD_MBHC_DEF_BUTTONS);
@@ -4529,7 +4528,6 @@ static void *def_wcd_mbhc_cal(void)
 	btn_high = ((void *)&btn_cfg->_v_btn_low) +
 		(sizeof(btn_cfg->_v_btn_low[0]) * btn_cfg->num_btn);
 
-#if 1
 	btn_high[0] = 112;
 	btn_high[1] = 225;
 	btn_high[2] = 437;
@@ -4538,16 +4536,6 @@ static void *def_wcd_mbhc_cal(void)
 	btn_high[5] = 440;
 	btn_high[6] = 440;
 	btn_high[7] = 440;
-#else
-	btn_high[0] = 75;
-	btn_high[1] = 150;
-	btn_high[2] = 237;
-	btn_high[3] = 500;
-	btn_high[4] = 500;
-	btn_high[5] = 500;
-	btn_high[6] = 500;
-	btn_high[7] = 500;
-#endif
 
 	return wcd_mbhc_cal;
 }
@@ -6921,7 +6909,6 @@ static struct snd_soc_dai_link_component tfa98xx_dai_link_component[]=
 		.name= "tfa98xx.0-0034",
 		.dai_name="tfa98xx-aif-0-34",
 	},
-
 	{
 		.name= "tfa98xx.0-0035",
 		.dai_name="tfa98xx-aif-0-35",
@@ -7052,8 +7039,8 @@ static struct snd_soc_dai_link msm_mi2s_be_dai_links[] = {
 		.stream_name = "Quaternary MI2S Playback",
 		.cpu_dai_name = "msm-dai-q6-mi2s.3",
 		.platform_name = "msm-pcm-routing",
-		.codec_name = "msm-stub-codec.1",
-		.codec_dai_name = "msm-stub-rx",
+		.codecs = tfa98xx_dai_link_component,
+		.num_codecs = ARRAY_SIZE(tfa98xx_dai_link_component),
 		.no_pcm = 1,
 		.dpcm_playback = 1,
 		.id = MSM_BACKEND_DAI_QUATERNARY_MI2S_RX,
@@ -7067,8 +7054,8 @@ static struct snd_soc_dai_link msm_mi2s_be_dai_links[] = {
 		.stream_name = "Quaternary MI2S Capture",
 		.cpu_dai_name = "msm-dai-q6-mi2s.3",
 		.platform_name = "msm-pcm-routing",
-		.codec_name = "msm-stub-codec.1",
-		.codec_dai_name = "msm-stub-tx",
+		.codecs = tfa98xx_dai_link_component,
+		.num_codecs = ARRAY_SIZE(tfa98xx_dai_link_component),
 		.no_pcm = 1,
 		.dpcm_capture = 1,
 		.id = MSM_BACKEND_DAI_QUATERNARY_MI2S_TX,
