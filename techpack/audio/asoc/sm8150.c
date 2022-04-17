@@ -146,10 +146,6 @@ enum {
 	DP_RX_IDX = 0,
 	EXT_DISP_RX_IDX_MAX,
 };
-enum {
-	AFE_LOOPBACK_TX_IDX = 0,
-	AFE_LOOPBACK_TX_IDX_MAX,
-};
 
 enum {
 	AFE_LOOPBACK_TX_IDX = 0,
@@ -357,9 +353,6 @@ static struct dev_config slim_tx_cfg[] = {
 	[SLIM_TX_6] = {SAMPLING_RATE_48KHZ, SNDRV_PCM_FORMAT_S16_LE, 1},
 	[SLIM_TX_7] = {SAMPLING_RATE_8KHZ, SNDRV_PCM_FORMAT_S16_LE, 1},
 	[SLIM_TX_8] = {SAMPLING_RATE_48KHZ, SNDRV_PCM_FORMAT_S16_LE, 2},
-};
-static struct dev_config afe_loopback_tx_cfg[] = {
-	[AFE_LOOPBACK_TX_IDX] = {SAMPLING_RATE_48KHZ, SNDRV_PCM_FORMAT_S16_LE, 1},
 };
 
 static struct dev_config afe_loopback_tx_cfg[] = {
@@ -636,6 +629,7 @@ static SOC_ENUM_SINGLE_EXT_DECL(hifi_function, hifi_text);
 
 static const char *const vreg_text[] = {"Disable", "Enable"};
 static SOC_ENUM_SINGLE_EXT_DECL(vreg_setting, vreg_text);
+
 static struct platform_device *spdev;
 
 static int msm_hifi_control;
@@ -661,12 +655,6 @@ static struct wcd_mbhc_config wcd_mbhc_cfg = {
 	.mono_stero_detection = false,
 	.swap_gnd_mic = NULL,
 	.hs_ext_micbias = true,
-#if 1
-	.key_code[0] = KEY_MEDIA,
-	.key_code[1] = KEY_VOLUMEUP,
-	.key_code[2] = KEY_VOLUMEDOWN,
-	.key_code[3] = 0,
-#else
 	.key_code[0] = KEY_MEDIA,
 	.key_code[1] = KEY_VOLUMEUP,
 	.key_code[2] = KEY_VOLUMEDOWN,
@@ -7003,7 +6991,6 @@ static struct snd_soc_dai_link msm_mi2s_be_dai_links[] = {
 		.ops = &msm_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
-#if 1
 	{
 		.name = LPASS_BE_QUAT_MI2S_RX,
 		.stream_name = "Quaternary MI2S Playback",
@@ -7033,37 +7020,6 @@ static struct snd_soc_dai_link msm_mi2s_be_dai_links[] = {
 		.ops = &msm_mi2s_be_ops,
 		.ignore_suspend = 1,
 	},
-#else
-	{
-		.name = LPASS_BE_QUAT_MI2S_RX,
-		.stream_name = "Quaternary MI2S Playback",
-		.cpu_dai_name = "msm-dai-q6-mi2s.3",
-		.platform_name = "msm-pcm-routing",
-		.codecs = tfa98xx_dai_link_component,
-		.num_codecs = ARRAY_SIZE(tfa98xx_dai_link_component),
-		.no_pcm = 1,
-		.dpcm_playback = 1,
-		.id = MSM_BACKEND_DAI_QUATERNARY_MI2S_RX,
-		.be_hw_params_fixup = msm_be_hw_params_fixup,
-		.ops = &msm_mi2s_be_ops,
-		.ignore_suspend = 1,
-		.ignore_pmdown_time = 1,
-	},
-	{
-		.name = LPASS_BE_QUAT_MI2S_TX,
-		.stream_name = "Quaternary MI2S Capture",
-		.cpu_dai_name = "msm-dai-q6-mi2s.3",
-		.platform_name = "msm-pcm-routing",
-		.codecs = tfa98xx_dai_link_component,
-		.num_codecs = ARRAY_SIZE(tfa98xx_dai_link_component),
-		.no_pcm = 1,
-		.dpcm_capture = 1,
-		.id = MSM_BACKEND_DAI_QUATERNARY_MI2S_TX,
-		.be_hw_params_fixup = msm_be_hw_params_fixup,
-		.ops = &msm_mi2s_be_ops,
-		.ignore_suspend = 1,
-	},
-#endif
 	{
 		.name = LPASS_BE_QUIN_MI2S_RX,
 		.stream_name = "Quinary MI2S Playback",
@@ -7680,7 +7636,6 @@ static struct snd_soc_card *populate_snd_card_dailinks(struct device *dev)
 			       msm_mi2s_be_dai_links,
 			       sizeof(msm_mi2s_be_dai_links));
 			total_links += ARRAY_SIZE(msm_mi2s_be_dai_links);
-			pr_info("%s: add smartpa dai link is successful!\n", __func__);
 		}
 
 		ret = of_property_read_u32(dev->of_node,

@@ -971,13 +971,14 @@ static irqreturn_t wcd_mbhc_adc_hs_rem_irq(int irq, void *data)
 	bool hphpa_on = false;
 	u8  moisture_status = 0;
 
-	pr_info("%s: enter\n", __func__);
+	pr_debug("%s: enter\n", __func__);
 	WCD_MBHC_RSC_LOCK(mbhc);
 
 	if (snd_soc_component_update_bits(&component, WCD934X_INTR_BYPASS1, 0x12, 0x0) < 0)
 		pr_info("%s: reg update fail!\n", __func__);
 	else
 		pr_info("%s: reg update success!\n", __func__);
+
 	if (snd_soc_component_update_bits(&component, WCD934X_INTR_BYPASS1, 0x12, 0x12) < 0)
 		pr_info("%s: reg update fail!\n", __func__);
 	else
@@ -1069,7 +1070,7 @@ static irqreturn_t wcd_mbhc_adc_hs_rem_irq(int irq, void *data)
 	}
 exit:
 	WCD_MBHC_RSC_UNLOCK(mbhc);
-	pr_info("%s: leave\n", __func__);
+	pr_debug("%s: leave\n", __func__);
 	return IRQ_HANDLED;
 }
 
